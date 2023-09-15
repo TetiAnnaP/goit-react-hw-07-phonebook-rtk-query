@@ -1,38 +1,27 @@
-import { nanoid } from 'nanoid';
 import css from './ContactList.module.css';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts, selectFilter } from 'redux/rootReducer';
-import { deleteContactThunk, getContactsThunk } from 'thunk/thunk';
+import {
+  useGetContactsQuery,
+  useDeleteContactMutation,
+} from 'redux/contactsApi';
+
+import { useSelector } from 'react-redux';
+import { selectFilter } from 'redux/filterReducer';
 
 const ContactList = () => {
-  const [visibleContacts, setVisibleContacts] = useState([]);
-  const contacts = useSelector(selectContacts);
+  const { data = [], error, isLoading } = useGetContactsQuery();
+  const [deleteContact, result] = useDeleteContactMutation();
+
   const filter = useSelector(selectFilter);
-  const dispatch = useDispatch();
 
-  const handleDeleteBtn = e => {
-    const id = e.target.id;
-    dispatch(deleteContactThunk(id));
-  };
-
-  useEffect(() => {
-    dispatch(getContactsThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const filteredContacts = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter)
-    );
-
-    setVisibleContacts(filteredContacts);
-  }, [contacts, filter]);
+  const filteredContacts = data.filter(contact =>
+    contact.name.toLowerCase().includes(filter)
+  );
 
   return (
     <ul className={css.ul}>
-      {visibleContacts.map(contact => {
+      {filteredContacts.map(contact => {
         return (
-          <li className={css.li} key={nanoid()}>
+          <li className={css.li} key={contact.id}>
             <p className={css.text}>
               {contact.name}: {contact.phone}
             </p>
@@ -40,7 +29,7 @@ const ContactList = () => {
               className={css.sbmBtn}
               type="button"
               id={contact.id}
-              onClick={handleDeleteBtn}
+              onClick={() => deleteContact(contact.id)}
             >
               Delete
             </button>

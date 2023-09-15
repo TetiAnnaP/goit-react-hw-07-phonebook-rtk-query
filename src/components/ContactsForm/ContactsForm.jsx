@@ -1,14 +1,13 @@
 import css from './ContactsForm.module.css';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts } from 'redux/rootReducer';
-import { addContactsThunk } from 'thunk/thunk';
+import { useAddContactsMutation, useGetContactsQuery } from 'redux/contactsApi';
 
 const ContactsForm = () => {
-  const contacts = useSelector(selectContacts);
+  const [addContact] = useAddContactsMutation();
+  const { data = [], error, isLoading } = useGetContactsQuery();
+
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const dispatch = useDispatch();
 
   const handleChangeName = e => {
     setName(e.target.value);
@@ -18,10 +17,18 @@ const ContactsForm = () => {
     setNumber(e.target.value);
   };
 
+  const handleNewContact = async value => {
+    try {
+      await addContact(value);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
 
-    const nameExists = contacts.some(
+    const nameExists = data.some(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
     if (nameExists) {
@@ -33,7 +40,7 @@ const ContactsForm = () => {
       name: name,
       phone: number,
     };
-    dispatch(addContactsThunk(newContact));
+    handleNewContact(newContact);
 
     setName('');
     setNumber('');
@@ -48,7 +55,6 @@ const ContactsForm = () => {
             className={css.inputName}
             type="text"
             name="name"
-            // pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             value={name}
             required
@@ -62,7 +68,6 @@ const ContactsForm = () => {
             className={css.inputName}
             type="tel"
             name="number"
-            // pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             value={number}
             required
