@@ -8,8 +8,8 @@ import { useSelector } from 'react-redux';
 import { selectFilter } from 'redux/filterReducer';
 
 const ContactList = () => {
-  const { data = [], error, isLoading } = useGetContactsQuery();
-  const [deleteContact, result] = useDeleteContactMutation();
+  const { data = [] } = useGetContactsQuery();
+  const [deleteContact] = useDeleteContactMutation();
 
   const filter = useSelector(selectFilter);
 

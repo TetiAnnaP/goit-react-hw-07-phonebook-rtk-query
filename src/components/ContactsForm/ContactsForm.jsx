@@ -4,7 +4,7 @@ import { useAddContactsMutation, useGetContactsQuery } from 'redux/contactsApi';
 
 const ContactsForm = () => {
   const [addContact] = useAddContactsMutation();
-  const { data = [], error, isLoading } = useGetContactsQuery();
+  const { data = [] } = useGetContactsQuery();
 
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
