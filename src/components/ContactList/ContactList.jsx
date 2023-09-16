@@ -9,7 +9,7 @@ import { selectFilter } from 'redux/filterReducer';
 
 const ContactList = () => {
   const { data = [] } = useGetContactsQuery();
-  const [deleteContact] = useDeleteContactMutation();
+  const [deleteContact, result] = useDeleteContactMutation();
 
   const filter = useSelector(selectFilter);
 
@@ -30,6 +30,7 @@ const ContactList = () => {
               type="button"
               id={contact.id}
               onClick={() => deleteContact(contact.id)}
+              disabled={result.isLoading}
             >
               Delete
             </button>
